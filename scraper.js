@@ -2,15 +2,113 @@ import fs from 'fs';
 import * as cheerio from 'cheerio';
 
 const BENCHMARKS_GPU = {
-    "RTX 5090": 450, "RTX 5080": 380, "RTX 5070 Ti": 320, "RTX 5070": 290,
-    "RTX 5060 Ti": 230, "RTX 5060": 190, "RTX 5050": 150,
-    "RTX 4090": 350, "RX 7900 XTX": 310, "RTX 4080": 280, "RX 7900 XT": 250,
-    "RTX 4070 Ti SUPER": 240, "RTX 4070 Ti": 220, "RX 7800 XT": 190,
-    "RTX 4070": 180, "RX 7700 XT": 160, "RTX 4060 Ti": 145, "RX 6700 XT": 135,
-    "RTX 3060 Ti": 130, "RTX 4060": 125, "RX 7600": 122, "RX 6600 XT": 110,
-    "RTX 3060": 100, "RX 6600": 98, "GTX 1660 SUPER": 75, "RTX 3050": 70,
-    "RX 580": 55, "GTX 1030": 25, "RX 9070 XT": 300, "RX 9070": 270,
-    "RX 9060 XT": 220, "ARC B580": 170, "ARC A380": 60, "RX 5600": 85
+  // NVIDIA GeForce - Serie 1000
+  "GT 1030": 15,
+  "GTX 1050": 30,
+  "GTX 1050 Ti": 35,
+  "GTX 1060": 50,
+  "GTX 1060 3GB": 45,
+  "GTX 1060 6GB": 50,
+  "GTX 1070": 65,
+  "GTX 1070 Ti": 70,
+  "GTX 1080": 75,
+  "GTX 1080 Ti": 85,
+
+  // NVIDIA GeForce - Serie 1600
+  "GTX 1630": 28,
+  "GTX 1650": 40,
+  "GTX 1650 Super": 48,
+  "GTX 1660": 55,
+  "GTX 1660 Super": 60,
+  "GTX 1660 Ti": 62,
+
+  // NVIDIA GeForce - Serie 2000
+  "RTX 2060": 72,
+  "RTX 2060 Super": 78,
+  "RTX 2070": 82,
+  "RTX 2070 Super": 88,
+  "RTX 2080": 92,
+  "RTX 2080 Super": 95,
+  "RTX 2080 Ti": 105,
+
+  // NVIDIA GeForce - Serie 3000
+  "RTX 3050": 65,
+  "RTX 3060": 100,
+  "RTX 3060 Ti": 115,
+  "RTX 3070": 130,
+  "RTX 3070 Ti": 135,
+  "RTX 3080": 160,
+  "RTX 3080 Ti": 170,
+  "RTX 3090": 185,
+  "RTX 3090 Ti": 195,
+
+  // NVIDIA GeForce - Serie 4000
+  "RTX 4060": 130,
+  "RTX 4060 Ti": 150,
+  "RTX 4060 Ti 16GB": 155,
+  "RTX 4070": 175,
+  "RTX 4070 Super": 190,
+  "RTX 4070 Ti": 195,
+  "RTX 4070 Ti Super": 210,
+  "RTX 4080": 230,
+  "RTX 4080 Super": 240,
+  "RTX 4090": 310,
+
+  // NVIDIA GeForce - Serie 5000
+  "RTX 5060": 145,
+  "RTX 5060 Ti": 165,
+  "RTX 5070": 210,
+  "RTX 5070 Ti": 240,
+  "RTX 5080": 280,
+  "RTX 5090": 370,
+
+  // AMD Radeon - Serie RX 500
+  "RX 550": 20,
+  "RX 560": 28,
+  "RX 570": 42,
+  "RX 580": 48,
+  "RX 590": 52,
+
+  // AMD Radeon - Serie RX 5000
+  "RX 5500 XT": 50,
+  "RX 5600 XT": 72,
+  "RX 5700": 80,
+  "RX 5700 XT": 88,
+
+  // AMD Radeon - Serie RX 6000
+  "RX 6400": 30,
+  "RX 6500 XT": 35,
+  "RX 6600": 85,
+  "RX 6600 XT": 95,
+  "RX 6650 XT": 98,
+  "RX 6700 XT": 110,
+  "RX 6750 XT": 115,
+  "RX 6800": 140,
+  "RX 6800 XT": 155,
+  "RX 6900 XT": 170,
+  "RX 6950 XT": 180,
+
+  // AMD Radeon - Serie RX 7000
+  "RX 7600": 100,
+  "RX 7600 XT": 110,
+  "RX 7700 XT": 135,
+  "RX 7800 XT": 155,
+  "RX 7900 GRE": 170,
+  "RX 7900 XT": 190,
+  "RX 7900 XTX": 210,
+
+  // AMD Radeon - Serie RX 9000
+  "RX 9060 XT": 140,
+  "RX 9070": 195,
+  "RX 9070 XT": 220,
+
+  // Intel Arc
+  "Arc A380": 25,
+  "Arc A580": 60,
+  "Arc A750": 80,
+  "Arc A770": 95,
+  "Arc B570": 110,
+  "Arc B580": 120,
 };
 
 function detectarModelo(titulo) {
