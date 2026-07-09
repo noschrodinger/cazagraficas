@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏆 Buscador GPU Calidad/Precio</title>
+    <!-- Tailwind CSS para el diseño rápido -->
+    <script src="https://jsdelivr.net"></script>
+    <!-- Vue.js para manejar los datos de forma simple -->
+    <script src="https://unpkg.com"></script>
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen p-4 md:p-8">
+
+    <div id="app" class="max-w-6xl mx-auto">
+        <header class="mb-8">
+            <h1 class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-violet-400">📊 GPU Finder Argentina</h1>
+            <p class="text-gray-400 text-sm mt-1">Precios reales, links verificados y ranking de rendimiento sin pagar de más.</p>
+        </header>
+
+        <!-- Filtros y Buscador -->
+        <div class="bg-gray-800 p-4 rounded-xl border border-gray-700 flex flex-col md:flex-row gap-4 justify-between items-center mb-6">
+            <input v-model="search" type="text" placeholder="Buscar modelo o tienda..." class="bg-gray-950 border border-gray-600 rounded-lg px-4 py-2 text-sm w-full md:w-64 focus:outline-none focus:border-blue-500">
+            
+            <div class="flex gap-2 w-full md:w-auto">
+                <select v-model="filterCondition" class="bg-gray-950 border border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-300">
+                    <option value="all">Todos</option>
+                    <option value="Nuevo">Nuevos</option>
+                    <option value="Outlet">Outlet / Minería</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Tabla de Ranking -->
+        <div class="bg-gray-800 border border-gray-700 rounded-xl overflow-hidden shadow-xl">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-gray-800 border-b border-gray-700 text-gray-400 text-xs uppercase tracking-wider">
+                        <tr>
+                            <th class="p-4">TOP</th>
+                            <th class="p-4">Modelo / Rendimiento</th>
+                            <th class="p-4">Tienda</th>
+                            <th class="p-4 text-center">Condición</th>
+                            <th class="p-4 text-right">Precio Cash</th>
+                            <th class="p-4 text-right">Ratio ($/Pto)</th>
+                            <th class="p-4 text-center">Link</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-700/50">
+                        <tr v-for="(p, i) in filteredProducts" :key="i" :class="{'bg-red-950/20 hover:bg-red-950/30': p.store === '710 Tech', 'hover:bg-gray-700/30 transition-colors': p.store !== '710 Tech'}">
+                            <td class="p-4 font-bold text-gray-500">#{{ i + 1 }}</td>
+                            <td class="p-4">
+                                <div class="font-semibold text-white">{{ p.product_title }}</div>
+                                <div class="text-xs text-gray-400 font-mono">Puntaje Benchmark: {{ p.score || 'N/A' }}</div>
+                            </td>
+                            <td class="p-4">
+                                <span class="font-medium">{{ p.store }}</span>
+                                <span v-if="p.store === '710 Tech'" class="ml-2 bg-red-500/10 text-red-400 text-[10px] px-2 py-0.5 rounded border border-red-500/20 font-bold">⚠️ ALERTA</span>
+                            </td>
+                            <td class="p-4 text-center">
+                                <span :class="p.condition === 'Outlet' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'" class="px-2 py-0.5 rounded-full text-xs font-medium">
+                                    {{ p.condition }}
+                                </span>
+                            </td>
+                            <td class="p-4 text-right font-mono font-bold text-emerald-400">
+                                ${{ p.cash_price.toLocaleString('es-AR') }}
+                            </td>
+                            <td class="p-4 text-right font-mono">
+                                <span class="text-gray-200 font-bold">${{ p.ratio }}</span>
+                                <span class="block text-[10px] text-gray-400">pesos/punto</span>
+                            </td>
+                            <td class="p-4 text-center">
+                                <a :href="p.product_url" target="_blank" class="text-blue-400 hover:text-blue-300 inline-block p-1 bg-gray-900 rounded border border-gray-700 hover:border-blue-500">🔗 Ver</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp, ref, computed, onMounted } = Vue;
+        createApp({
+            setup() {
+                const search = ref('');
+                const filterCondition = ref('all');
+                const products = ref([]);
+
+                // Tabla de rendimiento fija para calcular ratios instantáneamente
+                const BENCHMARKS = {
+                    "rtx 3060": 100, "rx 6600": 98, "rtx 4060": 125,
+                    "rx 7600": 122, "rtx 4060 ti": 145, "rtx 4070": 190
+                };
+
+                onMounted(async () => {
+                    try {
+                        // Lee el archivo generado por el scraper de GitHub
+                        const res = await fetch('./productos.json');
+                        const data = await res.json();
+                        
+                        // Procesa y calcula métricas
+                        products.value = data.map(p => {
+                            const modelKey = Object.keys(BENCHMARKS).find(k => p.gpu_model.toLowerCase().includes(k));
+                            const score = modelKey ? BENCHMARKS[modelKey] : 50; // 50 por defecto si no se conoce
+                            const ratio = Math.round((p.cash_price / score) * 100) / 100;
+                            return { ...p, score, ratio };
+                        }).sort((a, b) => a.ratio - b.ratio); // Ordena Calidad/Precio automáticamente
+                    } catch (e) { console.error("Error cargando productos:", e); }
+                });
+
+                const filteredProducts = computed(() => {
+                    return products.value.filter(p => {
+                        const matchesText = p.product_title.toLowerCase().includes(search.value.toLowerCase()) || p.store.toLowerCase().includes(search.value.toLowerCase());
+                        const matchesCond = filterCondition.value === 'all' || p.condition === filterCondition.value;
+                        return matchesText && matchesCond;
+                    });
+                });
+
+                return { search, filterCondition, filteredProducts };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
