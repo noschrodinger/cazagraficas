@@ -1,0 +1,54 @@
+[
+  {
+    "product_title": "ASUS Dual GeForce RTX 4060 8GB V2 OC (Garantía Oficial)",
+    "gpu_model": "RTX 4060",
+    "store": "Puerto Minero",
+    "condition": "Outlet",
+    "cash_price": 325000,
+    "list_price": 395000,
+    "installments_info": "3 cuotas sin interés con Banco Galicia",
+    "product_url": "https://puertominero.com.ar",
+    "trust_level": "Alta",
+    "score": 125,
+    "ratio": 2600
+  },
+  {
+    "product_title": "PNY GeForce RTX 4060 Ti 8GB XLR8 Gaming Velo",
+    "gpu_model": "RTX 4060 Ti",
+    "store": "710 Tech",
+    "condition": "Nuevo",
+    "cash_price": 460000,
+    "list_price": 570000,
+    "installments_info": "Cuotas con recargo de plataforma",
+    "product_url": "https://710tech.com",
+    "trust_level": "Alerta",
+    "score": 145,
+    "ratio": 3172.41
+  },
+  {
+    "product_title": "Gigabyte GeForce RTX 3060 WindForce 2X 12GB",
+    "gpu_model": "RTX 3060",
+    "store": "Quantum Hardstore",
+    "condition": "Nuevo",
+    "cash_price": 340000,
+    "list_price": 420000,
+    "installments_info": "6 cuotas sin interés con tarjetas Santander",
+    "product_url": "https://quantumhardstore.com.ar",
+    "trust_level": "Alta",
+    "score": 100,
+    "ratio": 3400
+  },
+  {
+    "product_title": "MSI GeForce RTX 4060 Ventus 2X 8GB Black",
+    "gpu_model": "RTX 4060",
+    "store": "CompraGamer",
+    "condition": "Nuevo",
+    "cash_price": 435000,
+    "list_price": 540000,
+    "installments_info": "12 cuotas con tarjeta de crédito",
+    "product_url": "https://compragamer.com",
+    "trust_level": "Alta",
+    "score": 125,
+    "ratio": 3480
+  }
+]
