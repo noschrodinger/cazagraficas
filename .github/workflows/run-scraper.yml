@@ -23,10 +23,13 @@ jobs:
         node-version: 20
 
     - name: Instalar dependencias
-      run: npm install
+      run: |
+        npm init -y
+        npm pkg set type="module"
+        npm install cheerio
 
-    - name: Correr Scraper Gratuito
-      run: npm run scrape
+    - name: Correr Scraper
+      run: node scraper.js
 
     - name: Subir cambios a GitHub Pages
       run: |
