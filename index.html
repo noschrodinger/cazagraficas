@@ -7,91 +7,197 @@
     <!-- Tailwind CSS Estable por CDN -->
     <script src="https://tailwindcss.com"></script>
     <!-- Vue.js para actualización instantánea -->
-    <script src="https://unpkg.com"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <!-- Iconos FontAwesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gray: {
+                            850: '#1f2937',
+                            900: '#111827',
+                            950: '#030712',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        [v-cloak] { display: none; }
+        .animate-fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 </head>
-<body class="bg-gray-900 text-gray-100 min-h-screen p-4 md:p-8">
+<body class="bg-gray-950 text-gray-100 min-h-screen font-sans selection:bg-blue-500/30">
 
-    <div id="app" class="max-w-6xl mx-auto">
-        <!-- Protección de carga para evitar pantallas colgadas -->
-        <div v-if="loading" class="flex flex-col items-center justify-center min-h-[400px] text-center">
-            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"></div>
-            <p class="text-gray-400 text-sm">Abriendo base de datos y ordenando por rendimiento...</p>
+    <div id="app" v-cloak class="max-w-7xl mx-auto p-4 md:p-8">
+        <!-- Protección de carga -->
+        <div v-if="loading" class="flex flex-col items-center justify-center min-h-[60vh] text-center">
+            <div class="animate-spin rounded-full h-14 w-14 border-t-2 border-b-2 border-blue-500 mb-4"></div>
+            <p class="text-gray-400 font-medium animate-pulse">Sincronizando base de datos de precios...</p>
         </div>
 
-        <!-- Interfaz Principal (Solo se ve cuando Vue está listo) -->
+        <!-- Interfaz Principal -->
         <div v-else>
-            <header class="mb-8">
-                <h1 class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-violet-400">📊 GPU Finder Argentina</h1>
-                <p class="text-gray-400 text-sm mt-1">Comparador automatizado libre de costos. Buscando en tiendas seguras seleccionadas.</p>
+            <!-- Header y Navegación con Tabs -->
+            <header class="mb-8 text-center md:text-left flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-gray-800 pb-6">
+                <div>
+                    <h1 class="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-violet-400 tracking-tight">
+                        <i class="fa-solid fa-bolt text-blue-500 mr-2"></i>GPU Finder
+                    </h1>
+                    <p class="text-gray-400 text-sm mt-2 font-medium">Comparador automatizado y Benchmarks en tiempo real.</p>
+                </div>
+                
+                <div class="flex bg-gray-900 rounded-lg p-1 border border-gray-800 mx-auto md:mx-0">
+                    <button @click="activeTab = 'precios'" :class="{'bg-gray-800 text-white shadow': activeTab === 'precios', 'text-gray-400 hover:text-gray-200': activeTab !== 'precios'}" class="px-6 py-2 rounded-md text-sm font-semibold transition-all">
+                        <i class="fa-solid fa-tag mr-2"></i>Precios
+                    </button>
+                    <button @click="activeTab = 'benchmarks'" :class="{'bg-gray-800 text-white shadow': activeTab === 'benchmarks', 'text-gray-400 hover:text-gray-200': activeTab !== 'benchmarks'}" class="px-6 py-2 rounded-md text-sm font-semibold transition-all">
+                        <i class="fa-solid fa-chart-simple mr-2"></i>Benchmarks
+                    </button>
+                </div>
             </header>
 
-            <!-- Filtros y Buscador -->
-            <div class="bg-gray-800 p-4 rounded-xl border border-gray-700 flex flex-col md:flex-row gap-4 justify-between items-center mb-6">
-                <input v-model="search" type="text" placeholder="Buscar placa o comercio..." class="bg-gray-950 border border-gray-600 rounded-lg px-4 py-2 text-sm w-full md:w-64 focus:outline-none focus:border-blue-500 text-white">
-                
-                <div class="flex gap-2 w-full md:w-auto">
-                    <select v-model="filterCondition" class="bg-gray-950 border border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-300">
+            <!-- TAB 1: BUSCADOR DE PRECIOS -->
+            <div v-show="activeTab === 'precios'" class="space-y-6 animate-fade-in">
+                <!-- Filtros -->
+                <div class="bg-gray-900 p-4 rounded-xl border border-gray-800 flex flex-col md:flex-row gap-4 items-center">
+                    <div class="relative w-full md:flex-1">
+                        <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                        <input v-model="search" type="text" placeholder="Buscar por modelo (ej. RTX 4060) o tienda..." class="bg-gray-950 border border-gray-700 rounded-lg pl-10 pr-4 py-2.5 text-sm w-full focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-white transition-all">
+                    </div>
+                    
+                    <select v-model="filterCondition" class="bg-gray-950 border border-gray-700 rounded-lg px-4 py-2.5 text-sm text-gray-300 w-full md:w-auto focus:outline-none focus:border-blue-500">
                         <option value="all">Todas las condiciones</option>
                         <option value="Nuevo">Nuevos</option>
                         <option value="Outlet">Outlet / Minería</option>
                     </select>
                 </div>
+
+                <!-- Tabla de Resultados -->
+                <div class="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden shadow-2xl">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm whitespace-nowrap">
+                            <thead class="bg-gray-950 border-b border-gray-800 text-gray-400 text-xs uppercase tracking-wider">
+                                <tr>
+                                    <th class="p-4 font-semibold">Rank</th>
+                                    <th class="p-4 font-semibold">Modelo</th>
+                                    <th class="p-4 font-semibold">Tienda</th>
+                                    <th class="p-4 font-semibold text-center">Estado</th>
+                                    <th class="p-4 font-semibold text-right">Precio Contado</th>
+                                    <th class="p-4 font-semibold text-right">Ratio</th>
+                                    <th class="p-4 font-semibold text-center">Enlace</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-800/50">
+                                <tr v-for="(p, i) in filteredProducts" :key="i" :class="{'bg-red-950/10 hover:bg-red-950/20 border-l-2 border-red-500': p.trust_level === 'Alerta', 'hover:bg-gray-800/40 transition-colors': p.trust_level !== 'Alerta'}">
+                                    <td class="p-4 font-bold text-gray-500 w-16">#{{ i + 1 }}</td>
+                                    <td class="p-4">
+                                        <div class="font-semibold text-gray-100">{{ p.product_title }}</div>
+                                        <div class="text-[11px] text-gray-500 font-mono mt-1"><i class="fa-solid fa-bolt text-yellow-500 mr-1"></i>Puntaje: {{ p.score || 50 }}</div>
+                                    </td>
+                                    <td class="p-4">
+                                        <div class="font-medium text-gray-300">{{ p.store }}</div>
+                                        <div v-if="p.trust_level === 'Alerta'" class="mt-1 text-[10px] text-red-400 font-bold uppercase"><i class="fa-solid fa-triangle-exclamation mr-1"></i>No confiable</div>
+                                    </td>
+                                    <td class="p-4 text-center">
+                                        <span :class="p.condition === 'Outlet' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'" class="px-2.5 py-1 rounded-md text-[11px] font-bold border uppercase tracking-wider">
+                                            {{ p.condition }}
+                                        </span>
+                                    </td>
+                                    <td class="p-4 text-right">
+                                        <div class="font-mono font-bold text-emerald-400 text-base">${{ p.cash_price ? p.cash_price.toLocaleString('es-AR') : '0' }}</div>
+                                        <div class="text-[10px] text-gray-500 mt-1" v-if="p.list_price">Lista: ${{ p.list_price.toLocaleString('es-AR') }}</div>
+                                    </td>
+                                    <td class="p-4 text-right font-mono">
+                                        <div class="text-blue-400 font-bold">${{ p.ratio || '0' }}</div>
+                                        <div class="text-[9px] text-gray-500 uppercase mt-1">x punto</div>
+                                    </td>
+                                    <td class="p-4 text-center">
+                                        <a :href="p.product_url" target="_blank" class="text-gray-300 hover:text-white inline-flex items-center gap-2 px-3 py-1.5 bg-gray-800 hover:bg-blue-600 rounded border border-gray-700 hover:border-blue-500 text-xs font-semibold transition-all">
+                                            Ver <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr v-if="filteredProducts.length === 0">
+                                    <td colspan="7" class="p-8 text-center text-gray-500 font-medium">No se encontraron placas que coincidan con la búsqueda.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
 
-            <!-- Tabla de Ranking de Ofertas -->
-            <div class="bg-gray-800 border border-gray-700 rounded-xl overflow-hidden shadow-xl">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm">
-                        <thead class="bg-gray-800 border-b border-gray-700 text-gray-400 text-xs uppercase tracking-wider">
-                            <tr>
-                                <th class="p-4">TOP</th>
-                                <th class="p-4">Modelo / Rendimiento</th>
-                                <th class="p-4">Tienda</th>
-                                <th class="p-4 text-center">Condición</th>
-                                <th class="p-4 text-right">Precio Cash</th>
-                                <th class="p-4 text-right">Precio Lista / Financiación</th>
-                                <th class="p-4 text-right">Ratio ($/Pto)</th>
-                                <th class="p-4 text-center">Link</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-700/50">
-                            <tr v-for="(p, i) in filteredProducts" :key="i" :class="{'bg-red-950/30 hover:bg-red-950/40 border-l-4 border-red-500': p.trust_level === 'Alerta', 'hover:bg-gray-700/30 transition-colors': p.trust_level !== 'Alerta'}">
-                                <td class="p-4 font-bold text-gray-500">#{{ i + 1 }}</td>
-                                <td class="p-4">
-                                    <div class="font-semibold text-white">{{ p.product_title }}</div>
-                                    <div class="text-xs text-gray-400 font-mono">Puntaje Benchmark: {{ p.score || 50 }} pts</div>
-                                </td>
-                                <td class="p-4">
-                                    <div class="flex flex-col">
-                                        <span class="font-medium text-gray-200">{{ p.store }}</span>
-                                        <span v-if="p.trust_level === 'Alerta'" class="mt-1 text-[10px] text-red-400 font-bold tracking-tight">⚠️ ADVERTENCIA: No confiable</span>
-                                    </div>
-                                </td>
-                                <td class="p-4 text-center">
-                                    <span :class="p.condition === 'Outlet' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'" class="px-2 py-0.5 rounded-full text-xs font-medium">
-                                        {{ p.condition }}
-                                    </span>
-                                </td>
-                                <td class="p-4 text-right font-mono font-bold text-emerald-400">
-                                    ${{ p.cash_price ? p.cash_price.toLocaleString('es-AR') : '0' }}
-                                </td>
-                                <td class="p-4 text-right text-xs text-gray-300">
-                                    <div v-if="p.list_price">
-                                        <span class="font-mono text-gray-400 block">${{ p.list_price.toLocaleString('es-AR') }}</span>
-                                        <span class="text-violet-400 text-[10px] font-medium">{{ p.installments_info }}</span>
-                                    </div>
-                                    <span v-else class="text-gray-500">No especifica</span>
-                                </td>
-                                <td class="p-4 text-right font-mono">
-                                    <span class="text-blue-400 font-bold">${{ p.ratio || '0' }}</span>
-                                    <span class="block text-[10px] text-gray-400">pesos/punto</span>
-                                </td>
-                                <td class="p-4 text-center">
-                                    <a :href="p.product_url" target="_blank" class="text-blue-400 hover:text-blue-300 inline-block px-3 py-1 bg-gray-900 rounded border border-gray-700 hover:border-blue-500 text-xs font-semibold transition-all">Ir a tienda ↗</a>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+            <!-- TAB 2: BENCHMARKS Y COMPARADOR -->
+            <div v-show="activeTab === 'benchmarks'" class="space-y-6 animate-fade-in">
+                
+                <!-- Comparador -->
+                <div class="bg-gray-900 border border-gray-800 rounded-xl p-6 shadow-2xl">
+                    <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-scale-balanced text-indigo-400"></i> Comparador Rápido
+                    </h2>
+                    
+                    <div class="flex flex-col md:flex-row items-center gap-4">
+                        <!-- GPU A -->
+                        <div class="w-full flex-1">
+                            <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Placa de Video A</label>
+                            <select v-model="gpuA" class="w-full bg-gray-950 border border-gray-700 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-indigo-500">
+                                <option v-for="gpu in allBenchmarks" :key="gpu.name" :value="gpu.name">{{ gpu.name }} ({{ gpu.score }} pts)</option>
+                            </select>
+                        </div>
+
+                        <!-- VS Icon -->
+                        <div class="flex-shrink-0 mt-6 md:mt-4 bg-gray-800 rounded-full p-3 border border-gray-700">
+                            <i class="fa-solid fa-bolt text-yellow-500"></i>
+                        </div>
+
+                        <!-- GPU B -->
+                        <div class="w-full flex-1">
+                            <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Placa de Video B</label>
+                            <select v-model="gpuB" class="w-full bg-gray-950 border border-gray-700 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-indigo-500">
+                                <option v-for="gpu in allBenchmarks" :key="gpu.name" :value="gpu.name">{{ gpu.name }} ({{ gpu.score }} pts)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Resultado Comparación -->
+                    <div class="mt-6 p-4 rounded-lg bg-gray-950 border border-gray-800 text-center" v-if="gpuA && gpuB">
+                        <p class="text-sm text-gray-400 mb-2">Rendimiento Relativo</p>
+                        <div class="flex flex-col md:flex-row justify-center items-center gap-2 text-lg">
+                            <span class="font-bold text-white">{{ gpuA }}</span>
+                            <span class="text-gray-500 text-sm">es</span>
+                            <span :class="comparativeResult.isBetter ? 'text-emerald-400' : 'text-red-400'" class="font-extrabold text-2xl">
+                                {{ comparativeResult.diff }}% {{ comparativeResult.isBetter ? 'superior' : 'inferior' }}
+                            </span>
+                            <span class="text-gray-500 text-sm">a</span>
+                            <span class="font-bold text-white">{{ gpuB }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lista de Benchmarks Visual -->
+                <div class="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden shadow-2xl">
+                    <div class="p-4 border-b border-gray-800 bg-gray-950">
+                        <h2 class="text-sm font-bold text-gray-300 uppercase tracking-wider">Ranking Global de Rendimiento</h2>
+                    </div>
+                    <div class="p-4 md:p-6 space-y-4">
+                        <div v-for="(gpu, index) in allBenchmarks" :key="gpu.name" class="flex items-center gap-4">
+                            <div class="w-8 text-right font-mono text-gray-500 text-sm">#{{ index + 1 }}</div>
+                            <div class="w-32 md:w-48 font-semibold text-sm text-gray-200 truncate" :title="gpu.name">{{ gpu.name }}</div>
+                            <div class="flex-1 h-3 md:h-4 bg-gray-800 rounded-full overflow-hidden">
+                                <div class="h-full bg-gradient-to-r from-blue-600 to-indigo-400 rounded-full" :style="{ width: (gpu.score / maxScore * 100) + '%' }"></div>
+                            </div>
+                            <div class="w-16 text-right font-mono font-bold text-indigo-400 text-sm">{{ gpu.score }}</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -99,12 +205,43 @@
 
     <script>
         const { createApp, ref, computed, onMounted } = Vue;
+        
+        // Base de datos extendida de benchmarks para el comparador
+        const BENCHMARKS_DB = [
+            {name: "RTX 4090", score: 350},
+            {name: "RX 7900 XTX", score: 310},
+            {name: "RTX 4080", score: 280},
+            {name: "RX 7900 XT", score: 250},
+            {name: "RTX 4070 Ti SUPER", score: 240},
+            {name: "RTX 4070 Ti", score: 220},
+            {name: "RX 7800 XT", score: 190},
+            {name: "RTX 4070", score: 180},
+            {name: "RX 7700 XT", score: 160},
+            {name: "RTX 4060 Ti", score: 145},
+            {name: "RX 6700 XT", score: 135},
+            {name: "RTX 3060 Ti", score: 130},
+            {name: "RTX 4060", score: 125},
+            {name: "RX 7600", score: 122},
+            {name: "RX 6600 XT", score: 110},
+            {name: "RTX 3060", score: 100},
+            {name: "RX 6600", score: 98},
+            {name: "GTX 1660 SUPER", score: 75},
+            {name: "RTX 3050", score: 70}
+        ];
+
         createApp({
             setup() {
                 const search = ref('');
                 const filterCondition = ref('all');
                 const products = ref([]);
                 const loading = ref(true);
+                const activeTab = ref('precios');
+
+                // Lógica del Comparador
+                const allBenchmarks = ref(BENCHMARKS_DB);
+                const maxScore = computed(() => Math.max(...allBenchmarks.value.map(g => g.score)));
+                const gpuA = ref('RTX 4060 Ti');
+                const gpuB = ref('RTX 3060');
 
                 onMounted(async () => {
                     try {
@@ -112,7 +249,7 @@
                         if (!res.ok) throw new Error();
                         products.value = await res.json();
                     } catch (e) { 
-                        console.log("Error cargando el archivo de datos.");
+                        console.log("No se pudo cargar productos.json, asegúrate de que el scraper haya corrido.");
                     } finally {
                         loading.value = false;
                     }
@@ -129,7 +266,22 @@
                     });
                 });
 
-                return { search, filterCondition, filteredProducts, loading };
+                const comparativeResult = computed(() => {
+                    const objA = allBenchmarks.value.find(g => g.name === gpuA.value);
+                    const objB = allBenchmarks.value.find(g => g.name === gpuB.value);
+                    if(!objA || !objB) return { diff: 0, isBetter: true };
+
+                    const diffPercent = ((objA.score - objB.score) / objB.score) * 100;
+                    return {
+                        diff: Math.abs(diffPercent).toFixed(1),
+                        isBetter: diffPercent >= 0
+                    };
+                });
+
+                return { 
+                    search, filterCondition, filteredProducts, loading, 
+                    activeTab, allBenchmarks, maxScore, gpuA, gpuB, comparativeResult
+                };
             }
         }).mount('#app');
     </script>
