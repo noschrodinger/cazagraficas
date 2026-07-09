@@ -1,0 +1,29 @@
+name: Actualizar Precios Automático
+
+on:
+  schedule:
+    - cron: '0 11 * * *' # Corre todos los días a las 11:00 UTC (8:00 AM Argentina)
+  workflow_dispatch: # Permite correrlo manualmente con un botón desde GitHub
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Clonar repositorio
+      uses: actions/checkout@v4
+
+    - name: Configurar Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-node-version: 20
+
+    - name: Correr Scraper Gratuito
+      run: node scraper.js
+
+    - name: Subir cambios a GitHub Pages
+      run: |
+        git config --global user.name "GitHub Action"
+        git config --global user.email "actions@github.com"
+        git add productos.json
+        git commit -m "Precios actualizados automáticamente" || exit 0
+        git push
