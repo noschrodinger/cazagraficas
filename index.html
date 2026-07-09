@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🏆 Buscador GPU Calidad/Precio</title>
-    <!-- Tailwind CSS v3 Estable por CDN -->
+    <!-- Tailwind CSS Estable por CDN -->
     <script src="https://tailwindcss.com"></script>
     <!-- Vue.js para actualización instantánea -->
     <script src="https://unpkg.com"></script>
@@ -12,13 +12,20 @@
 <body class="bg-gray-900 text-gray-100 min-h-screen p-4 md:p-8">
 
     <div id="app" class="max-w-6xl mx-auto">
-        <div v-cloak>
+        <!-- Protección de carga para evitar pantallas colgadas -->
+        <div v-if="loading" class="flex flex-col items-center justify-center min-h-[400px] text-center">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"></div>
+            <p class="text-gray-400 text-sm">Abriendo base de datos y ordenando por rendimiento...</p>
+        </div>
+
+        <!-- Interfaz Principal (Solo se ve cuando Vue está listo) -->
+        <div v-else>
             <header class="mb-8">
                 <h1 class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-violet-400">📊 GPU Finder Argentina</h1>
                 <p class="text-gray-400 text-sm mt-1">Comparador automatizado libre de costos. Buscando en tiendas seguras seleccionadas.</p>
             </header>
 
-            <!-- Filtros y Buscador de Componentes -->
+            <!-- Filtros y Buscador -->
             <div class="bg-gray-800 p-4 rounded-xl border border-gray-700 flex flex-col md:flex-row gap-4 justify-between items-center mb-6">
                 <input v-model="search" type="text" placeholder="Buscar placa o comercio..." class="bg-gray-950 border border-gray-600 rounded-lg px-4 py-2 text-sm w-full md:w-64 focus:outline-none focus:border-blue-500 text-white">
                 
@@ -52,7 +59,7 @@
                                 <td class="p-4 font-bold text-gray-500">#{{ i + 1 }}</td>
                                 <td class="p-4">
                                     <div class="font-semibold text-white">{{ p.product_title }}</div>
-                                    <div class="text-xs text-gray-400 font-mono">Puntaje Benchmark: {{ p.score }} pts</div>
+                                    <div class="text-xs text-gray-400 font-mono">Puntaje Benchmark: {{ p.score || 50 }} pts</div>
                                 </td>
                                 <td class="p-4">
                                     <div class="flex flex-col">
@@ -66,7 +73,7 @@
                                     </span>
                                 </td>
                                 <td class="p-4 text-right font-mono font-bold text-emerald-400">
-                                    ${{ p.cash_price.toLocaleString('es-AR') }}
+                                    ${{ p.cash_price ? p.cash_price.toLocaleString('es-AR') : '0' }}
                                 </td>
                                 <td class="p-4 text-right text-xs text-gray-300">
                                     <div v-if="p.list_price">
@@ -76,7 +83,7 @@
                                     <span v-else class="text-gray-500">No especifica</span>
                                 </td>
                                 <td class="p-4 text-right font-mono">
-                                    <span class="text-blue-400 font-bold">${{ p.ratio }}</span>
+                                    <span class="text-blue-400 font-bold">${{ p.ratio || '0' }}</span>
                                     <span class="block text-[10px] text-gray-400">pesos/punto</span>
                                 </td>
                                 <td class="p-4 text-center">
@@ -90,10 +97,6 @@
         </div>
     </div>
 
-    <style>
-        [v-cloak] { display: none !important; }
-    </style>
-
     <script>
         const { createApp, ref, computed, onMounted } = Vue;
         createApp({
@@ -101,6 +104,7 @@
                 const search = ref('');
                 const filterCondition = ref('all');
                 const products = ref([]);
+                const loading = ref(true);
 
                 onMounted(async () => {
                     try {
@@ -108,19 +112,24 @@
                         if (!res.ok) throw new Error();
                         products.value = await res.json();
                     } catch (e) { 
-                        console.log("Esperando actualización del archivo de datos por GitHub Actions.");
+                        console.log("Error cargando el archivo de datos.");
+                    } finally {
+                        loading.value = false;
                     }
                 });
 
                 const filteredProducts = computed(() => {
+                    if (!products.value) return [];
                     return products.value.filter(p => {
-                        const matchesText = p.product_title.toLowerCase().includes(search.value.toLowerCase()) || p.store.toLowerCase().includes(search.value.toLowerCase());
+                        const title = p.product_title ? p.product_title.toLowerCase() : '';
+                        const store = p.store ? p.store.toLowerCase() : '';
+                        const matchesText = title.includes(search.value.toLowerCase()) || store.includes(search.value.toLowerCase());
                         const matchesCond = filterCondition.value === 'all' || p.condition === filterCondition.value;
                         return matchesText && matchesCond;
                     });
                 });
 
-                return { search, filterCondition, filteredProducts };
+                return { search, filterCondition, filteredProducts, loading };
             }
         }).mount('#app');
     </script>
