@@ -52,13 +52,18 @@
                 <div class="flex bg-gray-900 rounded-lg p-1 border border-gray-800 mx-auto md:mx-0">
                     <button 
                         @click="activeTab = 'precios'" 
-                        :class="['flex items-center gap-2 px-6 py-2 rounded-md text-sm font-semibold transition-all', activeTab === 'precios' ? 'bg-gray-800 text-white shadow' : 'text-gray-400 hover:text-gray-200']">
+                        :class="['flex items-center gap-2 px-4 md:px-6 py-2 rounded-md text-sm font-semibold transition-all whitespace-nowrap', activeTab === 'precios' ? 'bg-gray-800 text-white shadow' : 'text-gray-400 hover:text-gray-200']">
                         <i data-lucide="tag" class="w-4 h-4"></i> Precios
                     </button>
                     <button 
                         @click="activeTab = 'benchmarks'" 
-                        :class="['flex items-center gap-2 px-6 py-2 rounded-md text-sm font-semibold transition-all', activeTab === 'benchmarks' ? 'bg-gray-800 text-white shadow' : 'text-gray-400 hover:text-gray-200']">
+                        :class="['flex items-center gap-2 px-4 md:px-6 py-2 rounded-md text-sm font-semibold transition-all whitespace-nowrap', activeTab === 'benchmarks' ? 'bg-gray-800 text-white shadow' : 'text-gray-400 hover:text-gray-200']">
                         <i data-lucide="bar-chart-2" class="w-4 h-4"></i> Benchmarks
+                    </button>
+                    <button 
+                        @click="activeTab = 'info'" 
+                        :class="['flex items-center gap-2 px-4 md:px-6 py-2 rounded-md text-sm font-semibold transition-all whitespace-nowrap', activeTab === 'info' ? 'bg-gray-800 text-white shadow' : 'text-gray-400 hover:text-gray-200']">
+                        <i data-lucide="info" class="w-4 h-4"></i> Info
                     </button>
                 </div>
             </header>
@@ -213,6 +218,71 @@
                                 {{ gpu.score }}
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PESTAÑA INFO -->
+            <div v-if="activeTab === 'info'" class="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div class="mb-6">
+                    <h2 class="text-xl font-bold text-white mb-2">¿Cómo funciona?</h2>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        <strong class="text-gray-200">GPU Finder</strong> escanea tiendas del mercado argentino de hardware y compara las placas de video encontradas usando un algoritmo de calidad/precio.
+                    </p>
+                </div>
+
+                <div class="bg-gray-900 border border-gray-800 rounded-xl p-6 shadow-2xl mb-6">
+                    <h3 class="text-sm font-bold text-gray-300 uppercase tracking-wider mb-4 flex items-center gap-2">
+                        <i data-lucide="square-asterisk" class="w-4 h-4 text-blue-400"></i> Fórmula de Calidad/Precio
+                    </h3>
+                    <div class="bg-[#030712] p-4 rounded-lg border border-gray-800 text-center mb-4">
+                        <code class="text-blue-400 font-mono text-sm">Ratio = Precio Efectivo / Puntaje de Rendimiento</code>
+                    </div>
+                    <p class="text-gray-500 text-xs leading-relaxed">
+                        Un ratio menor significa mejor valor. Por ejemplo, una RTX 4060 a $500.000 con 130 puntos de benchmark = ratio de $3.846/pt (excelente), mientras que la misma GPU a $900.000 = ratio de $6.923/pt (bueno).
+                    </p>
+                </div>
+
+                <div class="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden shadow-2xl">
+                    <div class="p-4 border-b border-gray-800 bg-[#030712]">
+                        <h3 class="text-sm font-bold text-gray-300 uppercase tracking-wider flex items-center gap-2">
+                            <i data-lucide="store" class="w-4 h-4 text-blue-400"></i> Tiendas Monitoreadas
+                        </h3>
+                    </div>
+                    <div class="p-0 overflow-x-auto">
+                        <table class="w-full text-left text-sm whitespace-nowrap">
+                            <tbody class="divide-y divide-gray-800/50">
+                                <tr class="hover:bg-gray-800/40 transition-colors">
+                                    <td class="p-4 font-semibold text-gray-200">CompraGamer</td>
+                                    <td class="p-4 text-gray-500 text-xs">Precios especiales en efectivo/transferencia</td>
+                                    <td class="p-4 text-right"><span class="text-emerald-400 font-medium text-xs">Alta</span></td>
+                                </tr>
+                                <tr class="hover:bg-gray-800/40 transition-colors">
+                                    <td class="p-4 font-semibold text-gray-200">Quantum Hardstore</td>
+                                    <td class="p-4 text-gray-500 text-xs">Opciones de financiación</td>
+                                    <td class="p-4 text-right"><span class="text-emerald-400 font-medium text-xs">Alta</span></td>
+                                </tr>
+                                <tr class="hover:bg-gray-800/40 transition-colors">
+                                    <td class="p-4 font-semibold text-gray-200">Puerto Minero</td>
+                                    <td class="p-4 text-gray-500 text-xs">Especialista en hardware usado y minería</td>
+                                    <td class="p-4 text-right"><span class="text-emerald-400 font-medium text-xs">Alta</span></td>
+                                </tr>
+                                <tr class="hover:bg-gray-800/40 transition-colors">
+                                    <td class="p-4 font-semibold text-gray-200">Otras tiendas</td>
+                                    <td class="p-4 text-gray-500 text-xs">Stock variado, ofertas del mercado</td>
+                                    <td class="p-4 text-right"><span class="text-emerald-400 font-medium text-xs">Alta</span></td>
+                                </tr>
+                                <tr class="bg-red-950/10 hover:bg-red-950/20 transition-colors">
+                                    <td class="p-4 font-semibold text-gray-200">710 Tech</td>
+                                    <td class="p-4 text-gray-500 text-xs">Reportes de baja confiabilidad</td>
+                                    <td class="p-4 text-right">
+                                        <span class="text-red-400 font-medium text-xs flex items-center justify-end gap-1">
+                                            <i data-lucide="alert-triangle" class="w-3 h-3"></i> Alerta
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
