@@ -1,0 +1,12 @@
+{
+  "name": "gpu-finder-argentina",
+  "version": "1.0.0",
+  "description": "Buscador de precios de placas de video en Argentina",
+  "type": "module",
+  "scripts": {
+    "scrape": "node scraper.js"
+  },
+  "dependencies": {
+    "cheerio": "^1.0.0"
+  }
+}
