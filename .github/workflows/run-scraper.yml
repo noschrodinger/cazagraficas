@@ -2,7 +2,7 @@ name: Actualizar Precios Automático
 
 on:
   schedule:
-    - cron: '0 11 * * *' # Corre todos los días a las 11:00 UTC (8:00 AM Argentina)
+    - cron: '0 */2 * * *' # Actualiza automáticamente cada 2 horas
   workflow_dispatch: # Permite correrlo manualmente con un botón desde GitHub
 
 jobs:
