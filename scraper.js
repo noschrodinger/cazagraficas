@@ -2,7 +2,7 @@ import fs from 'fs';
 import * as cheerio from 'cheerio';
 
 const BENCHMARKS_GPU = {
-  // NVIDIA GeForce - Serie 1000
+// NVIDIA GeForce - Serie 1000
   "GT 1030": 15,
   "GTX 1050": 30,
   "GTX 1050 Ti": 35,
@@ -124,14 +124,14 @@ async function ejecutarScraper() {
     // --- TIENDA 1: COMPRAGAMER ---
     productosRecolectados.push(
         {
-            product_title: "MSI GeForce RTX 4060 8GB GDDR6 Ventus 2X Black OC",
-            gpu_model: "RTX 4060",
+            product_title: "Asrock Radeon RX 7600 8GB GDDR6 Challenger OC",
+            gpu_model: "RX 7600",
             store: "CompraGamer",
             condition: "Nuevo",
             cash_price: 389900,
-            list_price: 489900,
-            installments_info: "12 cuotas fijas",
-            product_url: "https://compragamer.com/categorias/placas-de-video",
+            list_price: 501.550,
+            installments_info: "Hasta 18-24 cuotas fijas - Descuento con transferencia",
+            product_url: "https://compragamer.com/producto/Placa_de_Video_Asrock_Radeon_RX_7600_8GB_GDDR6_Challenger_OC_14722?cate=62",
             trust_level: "Alta"
         },
         {
